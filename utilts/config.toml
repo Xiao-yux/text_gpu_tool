@@ -1,0 +1,72 @@
+[OPTION]
+home = "/home/aisuan/"
+
+
+[LOG]
+log_path = "/home/aisuan/log"    #在log/$time目录下存储日志
+log_level = "DEBUG"  #大写
+console_output = false  #控制台输出日志
+log_file = "log.log"  #存储脚本执行的日志   日志级别-时间-选了什么
+sys_info = "sys_info.log"  #存储系统信息
+fd_file = "fd.log"    #存储Fd输出的日志
+gpu_burn_file = "gpu_burn.log"  #存储gpu_burn输出的日志
+nccl_file = "nccl.log"  #存储nccl输出的日志
+nvidia_file = "nvidia.log"  #存储nvidia-smi -q 输出的日志
+
+[MENU]
+meu = ["SYSTEM","GPU_BURN","FD_COMMAND","NCCL_COMMAND","DCGM","OPTION"]
+
+
+[MENU.SYSTEM]
+title = "系统信息"  #1级菜单名称
+command = "bash"  #执行命令
+home = ""  
+default_args =""
+args = {"CPU 内存信息"= "bash ../bash/sys_info.sh","硬盘网卡信息"= "bash ../bash/CX_DISK_INFO.sh", "NVIDIA GPU信息"= "bash ../bash/nvidia_info.sh"}
+onerun=""
+
+[MENU.OPTION]
+title = "设置"  #1级菜单名称
+command = "bash"  #执行命令
+home = ""  
+default_args =""
+args = {"退出脚本"= "exit 0","重启"= "reboot","关机"= "poweroff"}
+onerun=""
+
+
+
+[MENU.GPU_BURN]
+title = "GPU压力测试"  #1级菜单名称
+command = "gpu_burn"  #执行命令
+home = "/home/aisuan/gpu-burn"  #脚本所在目录，需要在目录下执行
+default_args =""
+# 2级菜单显示名称: 执行参数
+args = {"15分钟"= 900,"30分钟"= 1800,"1小时"= 3600,"2小时"= 7200,"4小时"= 14400,"8小时"= 28800,"12小时"= 43200,"24小时"= 86400,"48小时"= 172800}
+onerun=""
+
+
+[MENU.DCGM]
+title = "DCGM测试"
+command = "bash"  
+home = ""  #脚本所在目录
+default_args = "" # 默认追加参数
+args = {"运行level1测试"='nvidia-smi -pm 1 && dcgmi diag -r 1',"运行level2测试"='nvidia-smi -pm 1 && dcgmi diag -r 2',"运行level3测试"='nvidia-smi -pm 1 && dcgmi diag -r 3',"运行level4测试"='nvidia-smi -pm 1 && dcgmi diag -r 4'}
+onerun=""
+
+
+[MENU.FD_COMMAND]
+title = "FD测试(fieldiag)"
+command = "fieldiag.sh"   #执行的脚本
+home = "/home/aisuan/fd"  #脚本所在目录
+default_args = "--no_bmc" # 默认追加参数
+args = {"运行level1测试"='--level1',"运行level2测试"='--level2'}
+onerun="systemctl restart nvidia-powerd && systemctl restart nvidia-fabricmanager"
+
+
+[MENU.NCCL_COMMAND]
+title = "NCCL测试"
+command = "all_reduce_perf"
+home = "/home/aisuan/nccl"
+default_args =""
+args = {"运行nccl测试"='-b 256M -e 20G -f 2 -g $GPU_COUNT'}
+onerun=""
